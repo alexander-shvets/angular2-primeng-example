@@ -22,7 +22,7 @@ class Letter {
         </p-tree>
     
         <p-dataTable  [value]="state.table.items"
-          	    [(selection)]="state.table.selected"
+                [(selection)]="state.table.selected"
                      (onDrop)="moveSelected({from:'tree', to:'table'})"
                    pDroppable="state.tree.items"
                    pDraggable="state.table.items"
@@ -52,7 +52,6 @@ class Letter {
 }) export class AlphabetApp {
 
     alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
     /** default number of tree items, the rest goes to table */
     treeSize = 10
 
