@@ -33,10 +33,10 @@ class Letter {
             <p-column   field="letter" header="Letter"></p-column>
     
             <footer>
-                <p-dropdown 
+                <p-multiSelect 
                     [options]="state.available.items" 
                   [(ngModel)]="state.available.selected">
-                </p-dropdown>
+                </p-multiSelect>
                 <button label="Add"    pButton type="button"
                       (click)="moveSelected({from:'available', to:'table'})"
                    [disabled]="state.available.selected.length === 0">
