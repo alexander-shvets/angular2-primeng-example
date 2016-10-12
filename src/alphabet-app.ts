@@ -1,36 +1,46 @@
-import {Component} from '@angular/core'
-import {DragDropModule, TreeModule, DataTableModule, DropdownModule, ButtonModule}
+import {Component, NgModule} from '@angular/core'
+import {BrowserModule}       from '@angular/platform-browser'
+import {FormsModule}         from '@angular/forms'
+import {DragDropModule, TreeModule, DataTableModule, DropdownModule, MultiSelectModule, ButtonModule}
   from 'primeng/primeng'
+
+const ngAppModule =()=> ({
+    imports:      [BrowserModule, FormsModule, DragDropModule, TreeModule, DataTableModule, DropdownModule, MultiSelectModule, ButtonModule],
+    declarations: [AlphabetApp],
+    bootstrap:    [AlphabetApp],
+})
 
 /** Common Data Item Model */
 class Letter {
-    letter: string
-    toString(){ return this.letter }// enable sorting array of Letters and displaying dropdown options
-    constructor( letter ){ this.letter = letter }
+    label: string
+    toString(){ return this.label }// enable sorting array of Letters and displaying dropdown options
+    get value(){ return this.label }
+    constructor( letter ){ this.label = letter }
 }
 
 @Component({
-    selector: 'app-root',
+    selector: 'alphabet-app',
     template: `
     <div class="ui-grid">
         <p-tree       [value]="state.tree.items"
                 [(selection)]="state.tree.selected"
                      (onDrop)="moveSelected({from:'table', to:'tree'})"
-                   pDroppable="state.table.items"
-                   pDraggable="state.tree.items"
-                        class="ui-grid-col-4">
+                   pDroppable="table"
+                   pDraggable="tree"
+                selectionMode="multiple"
+                        class="ui-grid-col-4" scrollHeight="400px">
         </p-tree>
     
         <p-dataTable  [value]="state.table.items"
                 [(selection)]="state.table.selected"
                      (onDrop)="moveSelected({from:'tree', to:'table'})"
-                   pDroppable="state.tree.items"
-                   pDraggable="state.table.items"
-                        class="ui-grid-col-8">
-    
+                   pDroppable="tree" 
+                   pDraggable="table"
+                        class="ui-grid-col-8" scrollHeight="400px">
+
             <p-column 
                 selectionMode="multiple"></p-column>
-            <p-column   field="letter" header="Letter"></p-column>
+            <p-column   field="label" header="Letter"></p-column>
     
             <footer>
                 <p-multiSelect 
@@ -73,13 +83,17 @@ class Letter {
     removeSelected( from ){
         const fromState = this.state[ from ]
         const selected  = fromState.selected
+        const removed   = []
         if( selected.length ){
             const items = fromState.items
-            selected.forEach( selectedItem =>
-                items.splice( items.indexOf( selectedItem ), 1) )
+            selected.forEach( selectedItem => {
+                const found = items.findIndex( item => item == selectedItem )
+                if( found >= 0 ) removed.push( items.splice(found, 1)[0] )
+                else console.error("Can't remove: inconsistent state")
+            })
             fromState.selected = []
         }
-        return selected
+        return removed
     }
 
     constructor(){
@@ -88,3 +102,5 @@ class Letter {
         this.state.table.items = letters.slice( this.treeSize )
     }
 }
+
+@NgModule( ngAppModule() ) export class AppModule { }
